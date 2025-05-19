@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comprar Bebidas</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .oculto {
+            display: none;
+        }
+        
+        .productos-container {
+            transition: all 0.3s ease;
+        }
+        
+        #categoria {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #3498db;
+            border-radius: 6px;
+            background-color: rgba(0, 0, 0, 0.2);
+            color: #fff;
+            font-size: 1em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Realizar Compra</h1>
+
+        {% with messages = get_flashed_messages(category_filter=['error', 'success', 'warning']) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for message in messages %}
+                        <p class="{{ category }}">{{ message }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <div class="form-group">
+            <label for="categoria">Categoría:</label>
+            <select id="categoria" name="categoria" required onchange="mostrarProductosPorCategoria(this.value)">
+                <option value="">Seleccionar Categoría</option>
+                {% for cat in categorias %}
+                    <option value="{{ cat }}">{{ cat }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div id="productos-por-categoria">
+            {% for categoria, lista_bebidas in bebidas_por_categoria.items() %}
+                <div class="categoria-container productos-container oculto" id="categoria_{{ categoria|replace(' ', '_') }}">
+                    <h2 class="categoria-titulo">{{ categoria }}</h2>
+                    {% for bebida in lista_bebidas %}
+                        <div class="producto-item">
+                            <div class="producto-nombre">{{ bebida['nombre'] }}</div>
+                            <div class="producto-marca">{{ bebida['marca'] }}</div>
+                            <div class="producto-cantidad">
+                                <input type="number" id="cantidad_{{ bebida['_id'] }}" value="1" min="1">
+                            </div>
+                            <div class="producto-agregar">
+                                <button class="btn" onclick="agregarAlCarrito('{{ bebida['_id'] }}', '{{ bebida['nombre'] }}', {{ bebida['precio'] }})">Agregar</button>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+        </div>
+
+        <h2>Carrito de Compras</h2>
+        <div id="carrito-items">
+        </div>
+
+        <form method="POST">
+            <input type="hidden" id="carrito_data" name="carrito_data">
+            <div class="form-group">
+                <label for="cliente">Nombre del Cliente:</label>
+                <input type="text" id="cliente" name="cliente" required>
+            </div>
+            <button type="submit" class="btn btn-success">Finalizar Compra</button>
+        </form>
+
+        <div class="nav-buttons">
+            {% if session.get('ultima_venta_ids') %}
+                <a href="{{ url_for('generar_factura') }}" class="btn btn-info" target="_blank">Imprimir Factura</a>
+            {% endif %}
+            <a href="{{ url_for('user_panel') }}" class="btn btn-secondary">Volver al Panel de Usuario</a>
+        </div>
+    </div>
+
+    <script>
+        let carrito = [];
+
+        // Función para mostrar productos por categoría
+        function mostrarProductosPorCategoria(categoriaSeleccionada) {
+            // Ocultar todos los contenedores de productos primero
+            const productosContainers = document.querySelectorAll('.productos-container');
+            productosContainers.forEach(container => {
+                container.classList.add('oculto');
+            });
+
+            // Mostrar solo la categoría seleccionada
+            if (categoriaSeleccionada) {
+                const categoriaId = 'categoria_' + categoriaSeleccionada.replace(/ /g, '_');
+                const contenedorMostrar = document.getElementById(categoriaId);
+                if (contenedorMostrar) {
+                    contenedorMostrar.classList.remove('oculto');
+                    
+                    // Desplazarse suavemente a la categoría seleccionada
+                    contenedorMostrar.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }
+        }
+
+        function agregarAlCarrito(id, nombre, precio) {
+            let cantidad = parseInt(document.getElementById('cantidad_' + id).value);
+            if (cantidad <= 0) {
+                alert('La cantidad debe ser mayor que cero.');
+                return;
+            }
+
+            let itemExistente = carrito.find(item => item.id === id);
+            if (itemExistente) {
+                itemExistente.cantidad += cantidad;
+            } else {
+                carrito.push({ 
+                    id: id, 
+                    nombre: nombre, 
+                    precio: precio, 
+                    cantidad: cantidad 
+                });
+            }
+
+            actualizarCarrito();
+            
+            // Mostrar mensaje de éxito
+            alert(`Se agregó ${cantidad} ${nombre} al carrito`);
+        }
+
+        function actualizarCarrito() {
+            let carritoItemsDiv = document.getElementById('carrito-items');
+            carritoItemsDiv.innerHTML = '';
+
+            let total = 0;
+            carrito.forEach(item => {
+                let itemTotal = item.precio * item.cantidad;
+                total += itemTotal;
+
+                let itemDiv = document.createElement('div');
+                itemDiv.classList.add('carrito-item');
+                itemDiv.innerHTML = `
+                    <span>${item.nombre} x ${item.cantidad} - $${itemTotal.toFixed(2)}</span>
+                    <button class="btn carrito-eliminar" onclick="eliminarDelCarrito('${item.id}')">Eliminar</button>
+                `;
+                carritoItemsDiv.appendChild(itemDiv);
+            });
+
+            if (carrito.length > 0) {
+                let totalDiv = document.createElement('div');
+                totalDiv.classList.add('carrito-total');
+                totalDiv.innerHTML = `<strong>Total: $${total.toFixed(2)}</strong>`;
+                carritoItemsDiv.appendChild(totalDiv);
+            } else {
+                carritoItemsDiv.innerHTML = '<p>No hay productos en el carrito</p>';
+            }
+
+            document.getElementById('carrito_data').value = JSON.stringify(carrito);
+        }
+
+        function eliminarDelCarrito(id) {
+            carrito = carrito.filter(item => item.id !== id);
+            actualizarCarrito();
+        }
+    </script>
+</body>
+</html>

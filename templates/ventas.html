@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Lista de Ventas</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+       
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('admin_panel') }}">Inicio</a></li>
+                </ul>
+        </nav>
+    </header>
+
+    <main>
+        <h2>Ventas Realizadas</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Bebida</th>
+                    <th>Cantidad</th>
+                    <th>Cliente</th>
+                    <th>Total</th>
+                    <th>Fecha</th>
+                    <th>Vendedor</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for venta in ventas %}
+                    <tr>
+                        <td>{{ venta._id }}</td>
+                        <td>{{ venta.bebida_nombre }}</td>
+                        <td>{{ venta.cantidad }}</td>
+                        <td>{{ venta.cliente }}</td>
+                        <td>{{ venta.total }}</td>
+                        <td>{{ venta.fecha.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                        <td>{{ venta.vendedor }}</td>
+                        <td>
+                            <a href="{{ url_for('devolver_venta', venta_id_str=venta._id) }}">Devolver</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </main>
+
+    <footer>
+       
+    </footer>
+</body>
+</html>

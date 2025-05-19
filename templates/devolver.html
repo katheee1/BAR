@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Devolver Venta</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('listar_ventas') }}">Volver a Ventas</a></li>
+                
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <h2>Detalles de la Venta</h2>
+        <p><strong>ID:</strong> {{ venta._id }}</p>
+        <p><strong>Bebida:</strong> {{ venta.bebida_nombre }}</p>
+        <p><strong>Cantidad Original:</strong> {{ venta.cantidad }}</p>
+        <p><strong>Cliente:</strong> {{ venta.cliente }}</p>
+        <p><strong>Total:</strong> {{ venta.total }}</p>
+        <p><strong>Fecha:</strong> {{ venta.fecha.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+        <p><strong>Vendedor:</strong> {{ venta.vendedor }}</p>
+
+        <h2>Formulario de Devolución</h2>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <ul>
+              {% for category, message in messages %}
+                <li class="{{ category }}">{{ message }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
+        <form method="POST">
+            <label for="cantidad">Cantidad a Devolver:</label>
+            <input type="number" id="cantidad" name="cantidad" min="1" max="{{ venta.cantidad }}" required>
+
+            <label for="motivo">Motivo de la Devolución:</label>
+            <textarea id="motivo" name="motivo" rows="4" cols="50" required></textarea>
+
+            <button type="submit">Registrar Devolución</button>
+        </form>
+    </main>
+
+    <footer>
+        
+    </footer>
+</body>
+</html>

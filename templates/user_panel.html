@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Usuario</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Panel de Usuario</h1>
+        <p><a href="{{ url_for('registros') }}" class="btn btn-info">Ver Bebidas</a></p>
+        <p><a href="{{ url_for('comprar') }}" class="btn btn-success">Realizar Compra</a></p>
+        <p><a href="{{ url_for('logout') }}" class="btn btn-danger">Cerrar Sesión</a></p>
+    </div>
+</body>
+</html>

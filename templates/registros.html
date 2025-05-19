@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registros de Bebidas</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Registros</h1>
+        {% with messages = get_flashed_messages(category_filter=['success']) %}
+            {% if messages %}
+                <div class="flash-messages">
+                    {% for message in messages %}
+                        <p class="success">{{ message }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        <h2>Bebidas Alcohólicas</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Marca</th>
+                    <th>Unidad</th>
+                    <th>Precio</th>
+                    <th>Stock</th>
+                    {% if session['role'] == 'admin' %}
+                        <th>Acciones</th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for bebida in alcoholicas %}
+                    <tr>
+                        <td>{{ bebida['nombre'] }}</td>
+                        <td>{{ bebida['marca'] }}</td>
+                        <td>{{ bebida['unidad'] }}</td>
+                        <td>${{ bebida['precio'] }}</td>
+                        <td>{{ bebida['stock'] }}</td>
+                        {% if session['role'] == 'admin' %}
+                            <td>
+                                <a href="{{ url_for('modificar', id=bebida['_id']) }}" class="btn btn-warning btn-sm">Modificar</a>
+                                <a href="{{ url_for('eliminar', id=bebida['_id']) }}" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de eliminar esta bebida?')">Eliminar</a>
+                            </td>
+                        {% endif %}
+                    </tr>
+                {% else %}
+                    {% if not alcoholicas %}
+                        <tr><td colspan="{% if session['role'] == 'admin' %}6{% else %}5{% endif %}">No hay bebidas alcohólicas registradas.</td></tr>
+                    {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <h2>Bebidas No Alcohólicas</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Marca</th>
+                    <th>Unidad</th>
+                    <th>Precio</th>
+                    <th>Stock</th>
+                    {% if session['role'] == 'admin' %}
+                        <th>Acciones</th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for bebida in no_alcoholicas %}
+                    <tr>
+                        <td>{{ bebida['nombre'] }}</td>
+                        <td>{{ bebida['marca'] }}</td>
+                        <td>{{ bebida['unidad'] }}</td>
+                        <td>${{ bebida['precio'] }}</td>
+                        <td>{{ bebida['stock'] }}</td>
+                        {% if session['role'] == 'admin' %}
+                            <td>
+                                <a href="{{ url_for('modificar', id=bebida['_id']) }}" class="btn btn-warning btn-sm">Modificar</a>
+                                <a href="{{ url_for('eliminar', id=bebida['_id']) }}" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de eliminar esta bebida?')">Eliminar</a>
+                            </td>
+                        {% endif %}
+                    </tr>
+                {% else %}
+                    {% if not no_alcoholicas %}
+                        <tr><td colspan="{% if session['role'] == 'admin' %}6{% else %}5{% endif %}">No hay bebidas no alcohólicas registradas.</td></tr>
+                    {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <h2>Snacks</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Marca</th>
+                    <th>Unidad</th>
+                    <th>Precio</th>
+                    <th>Stock</th>
+                    {% if session['role'] == 'admin' %}
+                        <th>Acciones</th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for snack in snacks %}
+                    <tr>
+                        <td>{{ snack['nombre'] }}</td>
+                        <td>{{ snack['marca'] }}</td>
+                        <td>{{ snack['unidad'] }}</td>
+                        <td>${{ snack['precio'] }}</td>
+                        <td>{{ snack['stock'] }}</td>
+                        {% if session['role'] == 'admin' %}
+                            <td>
+                                <a href="{{ url_for('modificar', id=snack['_id']) }}" class="btn btn-warning btn-sm">Modificar</a>
+                                <a href="{{ url_for('eliminar', id=snack['_id']) }}" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de eliminar este snack?')">Eliminar</a>
+                            </td>
+                        {% endif %}
+                    </tr>
+                {% else %}
+                    {% if not snacks %}
+                        <tr><td colspan="{% if session['role'] == 'admin' %}6{% else %}5{% endif %}">No hay snacks registrados.</td></tr>
+                    {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% if session['role'] == 'admin' %}
+            <p><a href="{{ url_for('admin_panel') }}" class="btn btn-secondary">Volver al Panel de Administración</a></p>
+        {% else %}
+            <p><a href="{{ url_for('user_panel') }}" class="btn btn-secondary">Volver al Panel de Usuario</a></p>
+        {% endif %}
+    </div>
+</body>
+</html>

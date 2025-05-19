@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Panel de Administración</h1>
+        <p><a href="{{ url_for('insertar') }}" class="btn btn-primary">Insertar Nueva Bebida</a></p>
+        <p><a href="{{ url_for('registros') }}" class="btn btn-info">Ver y Modificar Registros</a></p>
+        <p><a href="{{ url_for('listar_ventas') }}" class="btn btn-success">Ver Ventas y Devoluciones</a></p>
+        <p><a href="{{ url_for('logout') }}" class="btn btn-danger">Cerrar Sesión</a></p>
+    </div>
+</body>
+</html>
